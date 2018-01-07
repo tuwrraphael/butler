@@ -6,7 +6,12 @@
   "author": {
     "name": "raphael"
   },
+  "scripts": {"start": "node dist/app.js"},
   "devDependencies": {
+    "@types/express": "^4.11.0",
     "@types/node": "^6.0.87"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
   }
 }

@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
-    "lib": ["es5"],
-    "sourceMap": true
+    "target": "es2017",
+    //"lib": ["es20"],
+    "sourceMap": true,
+    "outDir": "dist",
   },
   "exclude": [
     "node_modules"

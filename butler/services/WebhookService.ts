@@ -31,18 +31,20 @@ export class WebhookService {
     private invoke() {
         var dueHooks = this.webhooks.filter(w => w.isDue());
         dueHooks.forEach(w => {
-            w.url.protocol
+            var postData = JSON.stringify(w.data);
             var req = https.request({
                 host: w.url.host,
                 path: w.url.path,
                 port: "443",
                 method: "POST",
                 headers: {
-                    "Content-Length": 0
+                    "Content-Type": "application/json",
+                    "Content-Length": Buffer.byteLength(postData)
                 }
             }, function (res) {
                 console.log(`${new Date()}: Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
-            });
+                });
+            req.write(postData);
             req.end();
             this.webhooks.splice(this.webhooks.indexOf(w),1);
         });

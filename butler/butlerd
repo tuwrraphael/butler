@@ -1,0 +1,31 @@
+#!/bin/bash
+# /etc/init.d/butlerd
+
+### BEGIN INIT INFO
+# Provides:          butlerd
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: butler service
+# Description:       webhook sheduling
+### END INIT INFO
+
+
+case "$1" in 
+    start)
+        echo "Starting butler-service"
+		forever stop /home/raphael/butler/butler/dist/app.js
+		forever start /home/raphael/butler/butler/dist/app.js
+        ;;
+    stop)
+        echo "Stopping telemetry-gateway"
+        forever stop /home/raphael/butler/butler/dist/app.js
+        ;;
+    *)
+        echo "Usage: /etc/init.d/butlerd start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0

@@ -1,8 +1,10 @@
-﻿import { WebhookRequest } from "../models/WebhookRequest"
+﻿import { WebhookRequest, IPersistableWebhookRequest } from "../models/WebhookRequest"
+import * as fs from "fs";
 import * as https from "https";
 
 const INTERVAL = 60000 * 15;
 const GAP = 100;
+const FILE_NAME = "schedule.json";
 
 export class WebhookService {
 
@@ -10,13 +12,37 @@ export class WebhookService {
 
     constructor() {
         this.webhooks = [];
+        if (fs.existsSync(FILE_NAME)) {
+            var persisted = <IPersistableWebhookRequest[]>JSON.parse(fs.readFileSync(FILE_NAME, "utf8"));
+            persisted.forEach(v => {
+                var r = new WebhookRequest(null, null, null);
+                r.fromPersisted(v);
+                this.installHook(r);
+            });
+        }
         setInterval(this.invoke.bind(this), INTERVAL);
     }
 
-    public install(req: WebhookRequest) {
+    private installHook(req: WebhookRequest) {
         this.webhooks.push(req);
         var dueTime = req.dueTime();
         this.shedule(dueTime);
+        console.log(`${new Date()}: Scheduled ${req.url} at ${req.when}`);
+    }
+
+    private persistHooks() {
+        try {
+            var persisted = this.webhooks.map(v => v.getPersistable());
+            fs.writeFileSync(FILE_NAME, JSON.stringify(persisted), "utf8");
+        }
+        catch{
+            console.error("Could not store schedule");
+        }
+    }
+
+    public install(req: WebhookRequest) {
+        this.installHook(req);
+        this.persistHooks();
     }
 
     private shedule(dueTime: number) {
@@ -43,11 +69,11 @@ export class WebhookService {
                     "Content-Length": Buffer.byteLength(postData)
                 }
             }, function (res) {
-                console.log(`${start} until ${new Date()}: Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
-                });
+                console.log(`${start} until ${new Date()} (sheduled: ${w.when}): Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
+            });
             req.write(postData);
             req.end();
-            this.webhooks.splice(this.webhooks.indexOf(w),1);
+            this.webhooks.splice(this.webhooks.indexOf(w), 1);
         });
 
         var dueTimes = this.webhooks.map(w => w.dueTime()).sort();

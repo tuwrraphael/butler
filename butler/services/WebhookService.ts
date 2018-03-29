@@ -32,6 +32,7 @@ export class WebhookService {
         var dueHooks = this.webhooks.filter(w => w.isDue());
         dueHooks.forEach(w => {
             var postData = JSON.stringify(w.data);
+            var start = new Date();
             var req = https.request({
                 host: w.url.host,
                 path: w.url.path,
@@ -42,7 +43,7 @@ export class WebhookService {
                     "Content-Length": Buffer.byteLength(postData)
                 }
             }, function (res) {
-                console.log(`${new Date()}: Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
+                console.log(`${start} until ${new Date()}: Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
                 });
             req.write(postData);
             req.end();

@@ -57,6 +57,7 @@ export class WebhookService {
     }
 
     private invoke() {
+        console.log(`invoked at ${new Date()}`);
         var dueHooks = this.webhooks.filter(w => w.isDue());
         dueHooks.forEach(w => {
             var postData = JSON.stringify(w.data);

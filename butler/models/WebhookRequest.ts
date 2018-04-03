@@ -31,6 +31,6 @@ export class WebhookRequest {
     public fromPersisted(persisted: IPersistableWebhookRequest) {
         this.data = persisted.data;
         this.url = url.parse(persisted.url);
-        this.when = persisted.when;
+        this.when = new Date(persisted.when);
     }
 }

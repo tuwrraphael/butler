@@ -29,7 +29,7 @@ export class WebhookService {
         this.webhooks.push(req);
         var dueTime = req.dueTime();
         this.shedule(dueTime);
-        console.log(`${new Date()}: Scheduled ${req.url} at ${req.when}`);
+        console.log(`${new Date()}: Scheduled ${req.url.href} at ${req.when}`);
     }
 
     private persistHooks() {

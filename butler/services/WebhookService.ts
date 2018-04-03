@@ -1,4 +1,5 @@
-﻿import { WebhookRequest, IPersistableWebhookRequest } from "../models/WebhookRequest"
+
+import { WebhookRequest, IPersistableWebhookRequest } from "../models/WebhookRequest"
 import * as fs from "fs";
 import * as https from "https";
 
@@ -12,12 +13,13 @@ export class WebhookService {
 
     constructor() {
         this.webhooks = [];
+        var self = this;
         if (fs.existsSync(FILE_NAME)) {
             var persisted = <IPersistableWebhookRequest[]>JSON.parse(fs.readFileSync(FILE_NAME, "utf8"));
             persisted.forEach(v => {
                 var r = new WebhookRequest(null, null, null);
                 r.fromPersisted(v);
-                this.installHook(r);
+                self.installHook(r);
             });
         }
         setInterval(this.invoke.bind(this), INTERVAL);

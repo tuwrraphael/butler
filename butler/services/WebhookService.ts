@@ -3,7 +3,7 @@ import { WebhookRequest, IPersistableWebhookRequest } from "../models/WebhookReq
 import * as fs from "fs";
 import * as https from "https";
 
-const INTERVAL = 60000 * 15;
+const INTERVAL = 60000 * 2;
 const GAP = 100;
 const FILE_NAME = "schedule.json";
 
@@ -82,5 +82,6 @@ export class WebhookService {
         if (dueTimes.length) {
             this.shedule(dueTimes[0]);
         }
+        this.persistHooks();
     }
 }

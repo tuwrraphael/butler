@@ -53,7 +53,7 @@ export class WebhookService {
         }
         if (dueTime < 2 * INTERVAL) {
             var schedulingMs = dueTime + GAP;
-            var schedulingDate = new Date(0+(new Date())+schedulingMs);
+            var schedulingDate = new Date((+new Date())+schedulingMs);
             console.log(`${new Date()}: Scheduled timeout in ${schedulingMs} which is at ${schedulingDate}.`);
             setTimeout(this.invoke.bind(this), schedulingMs);
         }

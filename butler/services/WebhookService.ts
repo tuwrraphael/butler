@@ -3,7 +3,7 @@ import { WebhookRequest, IPersistableWebhookRequest } from "../models/WebhookReq
 import * as fs from "fs";
 import * as https from "https";
 
-const INTERVAL = 60000 * 2;
+const INTERVAL = 60000 * 3;
 const GAP = 100;
 const FILE_NAME = "schedule.json";
 
@@ -52,12 +52,15 @@ export class WebhookService {
             this.invoke();
         }
         if (dueTime < 2 * INTERVAL) {
-            setTimeout(this.invoke.bind(this), dueTime + GAP);
+            var schedulingMs = dueTime + GAP;
+            var schedulingDate = new Date(0+(new Date())+schedulingMs);
+            console.log(`${new Date()}: Scheduled timeout in ${schedulingMs} which is at ${schedulingDate}.`);
+            setTimeout(this.invoke.bind(this), schedulingMs);
         }
     }
 
     private invoke() {
-        console.log(`invoked at ${new Date()}`);
+        //console.log(`invoked at ${new Date()}`);
         var dueHooks = this.webhooks.filter(w => w.isDue());
         dueHooks.forEach(w => {
             var postData = JSON.stringify(w.data);

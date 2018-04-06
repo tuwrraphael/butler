@@ -50,11 +50,9 @@ export class WebhookService {
     private shedule(dueTime: number) {
         if (dueTime <= 0) {
             this.invoke();
-        }
+        } else
         if (dueTime < 2 * INTERVAL) {
             var schedulingMs = dueTime + GAP;
-            var schedulingDate = new Date((+new Date())+schedulingMs);
-            console.log(`${new Date()}: Scheduled timeout in ${schedulingMs} which is at ${schedulingDate}.`);
             setTimeout(this.invoke.bind(this), schedulingMs);
         }
     }
@@ -84,7 +82,16 @@ export class WebhookService {
 
         var dueTimes = this.webhooks.map(w => w.dueTime()).sort();
         if (dueTimes.length) {
+            console.log(`Next hook to call in ${(dueTimes[0] / 60.0 / 1000.0)} Minutes.`);
+            if (dueTimes[0] < 2 * INTERVAL) {
+                console.log("should schedule timeout");
+            }
+            else if (dueTimes[0] <= 0) {
+                console.log("should execute");
+            }
             this.shedule(dueTimes[0]);
+        } else {
+            console.log("No next hook found");
         }
         this.persistHooks();
     }

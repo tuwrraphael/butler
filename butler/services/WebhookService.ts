@@ -51,18 +51,18 @@ export class WebhookService {
         if (dueTime <= 0) {
             this.invoke();
         } else
-        if (dueTime < 2 * INTERVAL) {
-            var schedulingMs = dueTime + GAP;
-            setTimeout(this.invoke.bind(this), schedulingMs);
-        }
+            if (dueTime < 2 * INTERVAL) {
+                var schedulingMs = dueTime + GAP;
+                setTimeout(this.invoke.bind(this), schedulingMs);
+            }
     }
 
     private invoke() {
-        //console.log(`invoked at ${new Date()}`);
         var dueHooks = this.webhooks.filter(w => w.isDue());
         dueHooks.forEach(w => {
             var postData = JSON.stringify(w.data);
             var start = new Date();
+            var delay = (start.getTime() - w.when.getTime()) / 1000.0;
             var req = https.request({
                 host: w.url.host,
                 path: w.url.path,
@@ -73,25 +73,19 @@ export class WebhookService {
                     "Content-Length": Buffer.byteLength(postData)
                 }
             }, function (res) {
-                console.log(`${start} until ${new Date()} (sheduled: ${w.when}): Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
+                var duration = ((new Date().getTime()) - start.getTime()) / 1000.0;
+                console.log(`${start} (delay: ${delay.toPrecision(2)}s, duration: ${duration.toPrecision(2)}s): Called ${w.url.host}${w.url.path}, response status is ${res.statusCode}`);
             });
             req.write(postData);
             req.end();
             this.webhooks.splice(this.webhooks.indexOf(w), 1);
         });
-
-        var dueTimes = this.webhooks.map(w => w.dueTime()).sort();
+        function sortNumber(a, b) {
+            return a - b;
+        }
+        var dueTimes = this.webhooks.map(w => w.dueTime()).sort(sortNumber);
         if (dueTimes.length) {
-            console.log(`Next hook to call in ${(dueTimes[0] / 60.0 / 1000.0)} Minutes.`);
-            if (dueTimes[0] < 2 * INTERVAL) {
-                console.log("should schedule timeout");
-            }
-            else if (dueTimes[0] <= 0) {
-                console.log("should execute");
-            }
             this.shedule(dueTimes[0]);
-        } else {
-            console.log("No next hook found");
         }
         this.persistHooks();
     }

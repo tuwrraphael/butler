@@ -13,11 +13,11 @@ export class WebhookRequest {
     }
 
     public isDue() {
-        return (+this.when) <= (+new Date());
+        return (this.when.getTime()) <= (new Date().getTime());
     }
 
     public dueTime() {
-        return Math.max(0, (+this.when) - (+new Date()));
+        return Math.max(0, (this.when.getTime()) - (new Date().getTime()));
     }
 
     public getPersistable(): IPersistableWebhookRequest {

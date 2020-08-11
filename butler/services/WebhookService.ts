@@ -70,7 +70,8 @@ export class WebhookService {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Content-Length": Buffer.byteLength(postData)
+                    "Content-Length": Buffer.byteLength(postData),
+                    "User-Agent": "Butler"
                 }
             }, function (res) {
                 var duration = ((new Date().getTime()) - start.getTime()) / 1000.0;
